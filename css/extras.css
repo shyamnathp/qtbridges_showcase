@@ -84,3 +84,8 @@ a.url:before { font-family: monospace; content: attr(href); }
 .reveal .slides section .fragment.blur-in.visible {
   filter: blur(0);
 }
+
+.less-prominent {
+  opacity: 0.6;
+  color: #888 !important;
+}
