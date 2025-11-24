@@ -1,0 +1,372 @@
+/* Qt-themed customizations for reveal.js night theme */
+
+:root {
+  --qt-green: #41CD52;
+  --qt-green-dark: #17A81A;
+  --qt-green-light: #5FE67E;
+  --qt-neon: #2CDE85;
+  --qt-pine: #00414A;
+  --qt-lemon: #DBEB00;
+  --qt-violet: #CDB0FF;
+  --qt-midnight: #27138B;
+  --qt-mandarin: #FFA615;
+  --python-blue: #1E405D;
+  --python-yellow: #FFD43B;
+  --cpp-blue: #659BD3;
+  --cpp-dark-blue: #004283;
+  --rust-red: #EF4A00;
+}
+
+/* Override night theme colors with Qt branding */
+.reveal {
+  --r-link-color: var(--qt-green);
+  --r-link-color-hover: var(--qt-green-light);
+  --r-selection-background-color: var(--qt-green);
+  --r-heading-color: #fff;
+  --r-heading1-size: 2.2em;
+  --r-heading2-size: 1.6em;
+  --r-heading3-size: 1.3em;
+  --r-heading4-size: 1.1em;
+  --r-main-font-size: 32px;
+}
+
+/* Links with Qt green */
+.reveal a {
+  color: var(--qt-green) !important;
+  text-decoration: none;
+}
+
+.reveal a:hover {
+  color: var(--qt-green-light) !important;
+  text-decoration: underline;
+}
+
+/* Headings with subtle Qt styling */
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  text-transform: none;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+.reveal h1 {
+  font-size: 2.2em;
+}
+
+.reveal h2 {
+  font-size: 1.4em;
+}
+
+.reveal h3 {
+  font-size: 1.3em;
+}
+
+.reveal h4 {
+  font-size: 1.1em;
+}
+
+/* Add Qt green accent line under h2 */
+.reveal h2 {
+  border-bottom: 3px solid var(--qt-green);
+  padding-bottom: 10px;
+  display: inline-block;
+}
+
+/* Code blocks with better contrast */
+.reveal pre {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+  border-left: 4px solid var(--qt-green);
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+.reveal pre code {
+  background: #1e1e1e;
+  padding: 20px;
+  max-height: 600px;
+  font-size: 1em;
+}
+
+/* Inline code */
+.reveal code {
+  background: rgba(65, 205, 82, 0.1);
+  color: var(--qt-green-light);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.reveal pre code {
+  background: #1e1e1e;
+  color: #e8e8e8;
+}
+
+/* Lists with Qt green bullets */
+.reveal ul {
+  list-style: none;
+}
+
+.reveal ul > li::before {
+  content: "▸";
+  color: var(--qt-green);
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+/* Nested lists use default disc bullets */
+.reveal ul ul {
+  list-style: disc;
+}
+
+.reveal ul ul li::before {
+  content: none;
+}
+
+/* Ordered lists */
+.reveal ol {
+  counter-reset: custom-counter;
+  list-style: none;
+}
+
+.reveal ol li {
+  counter-increment: custom-counter;
+  position: relative;
+}
+
+.reveal ol li::before {
+  content: counter(custom-counter) ".";
+  color: var(--qt-green);
+  font-weight: bold;
+  display: inline-block;
+  width: 1.5em;
+  margin-left: -1.5em;
+}
+
+/* Tables with Qt styling */
+.reveal table {
+  border-collapse: collapse;
+  margin: 20px auto;
+}
+
+.reveal table th {
+  background-color: var(--qt-green);
+  color: #000;
+  font-weight: 600;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reveal table td {
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reveal table tbody tr:nth-child(even) {
+  background-color: rgba(65, 205, 82, 0.05);
+}
+
+.reveal table tbody tr:hover {
+  background-color: rgba(65, 205, 82, 0.15);
+}
+
+/* Blockquotes with Qt accent */
+.reveal blockquote {
+  border-left: 4px solid var(--qt-green);
+  background: rgba(65, 205, 82, 0.05);
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Slide numbers with Qt branding */
+.reveal .slide-number {
+  background-color: rgba(65, 205, 82, 0.8);
+  color: #000;
+  font-weight: 600;
+}
+
+/* Progress bar */
+.reveal .progress {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.reveal .progress span {
+  background: var(--qt-green);
+}
+
+/* Controls */
+.reveal .controls {
+  color: var(--qt-green);
+}
+
+/* Color utility classes */
+.qt-green {
+  color: var(--qt-green) !important;
+  font-style: normal;
+}
+
+.qt-green-dark {
+  color: var(--qt-green-dark) !important;
+  font-style: normal;
+}
+
+.qt-neon {
+  color: var(--qt-neon) !important;
+  font-style: normal;
+}
+
+.qt-lemon {
+  color: var(--qt-lemon) !important;
+  font-style: normal;
+}
+
+.qt-violet {
+  color: var(--qt-violet) !important;
+  font-style: normal;
+}
+
+.qt-mandarin {
+  color: var(--qt-mandarin) !important;
+  font-style: normal;
+}
+
+.python-blue {
+  color: var(--python-blue) !important;
+  font-style: normal;
+}
+
+.python-yellow {
+  color: var(--python-yellow) !important;
+  font-style: normal;
+}
+
+.cpp-blue {
+  color: var(--cpp-blue) !important;
+  font-style: normal;
+}
+
+.cpp-dark-blue {
+  color: var(--cpp-dark-blue) !important;
+  font-style: normal;
+}
+
+.rust-red {
+  color: var(--rust-red) !important;
+  font-style: normal;
+}
+
+/* Layout helpers for side-by-side code */
+#left {
+  float: left;
+  width: 48%;
+  text-align: left;
+}
+
+#right {
+  float: right;
+  width: 48%;
+  text-align: left;
+}
+
+#left70 {
+  float: left;
+  width: 68%;
+  text-align: left;
+}
+
+#right30 {
+  float: right;
+  width: 28%;
+  text-align: left;
+}
+
+#left30 {
+  float: left;
+  width: 28%;
+  text-align: left;
+}
+
+#right70 {
+  float: right;
+  width: 68%;
+  text-align: left;
+}
+
+/* Footer styling */
+#footer-left {
+  position: absolute;
+  bottom: 20px;
+  left: 30px;
+  display: flex;
+  align-items: center;
+  font-size: 14pt;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+#footer-left img {
+  margin-right: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .reveal h1 { font-size: 2.5em; }
+  .reveal h2 { font-size: 2em; }
+  .reveal h3 { font-size: 1.5em; }
+
+  #left, #right {
+    width: 100%;
+    float: none;
+  }
+
+  #left70, #right30, #left30, #right70 {
+    width: 100%;
+    float: none;
+  }
+}
+
+/* Custom Qt line separator */
+.qt-line {
+  border: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--qt-green), transparent);
+  margin: 20px 0;
+}
+
+/* Emphasis boxes */
+.reveal .box {
+  background: rgba(65, 205, 82, 0.1);
+  border: 2px solid var(--qt-green);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+/* Fragment highlighting */
+.reveal .fragment.highlight-qt-green {
+  opacity: 1;
+  visibility: inherit;
+}
+
+.reveal .fragment.highlight-qt-green.visible {
+  color: var(--qt-green);
+  font-weight: bold;
+}
+
+/* Better contrast for important notes */
+.reveal aside.notes {
+  color: #e8e8e8;
+}
+
+/* Image containers */
+.reveal img {
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.reveal img.clean {
+  box-shadow: none;
+  background: transparent;
+}

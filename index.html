@@ -8,8 +8,8 @@
 
   <link rel="stylesheet" href="reveal.js/dist/reset.css">
   <link rel="stylesheet" href="reveal.js/dist/reveal.css">
-  <link rel="stylesheet" href="css/qt-theme.css" id="theme">
-  <link rel="stylesheet" href="css/qt.css" id="theme">
+  <link rel="stylesheet" href="reveal.js/dist/theme/night.css" id="theme">
+  <link rel="stylesheet" href="css/qt-night.css">
   <link rel="stylesheet" href="css/extras.css">
 
   <!-- Theme used for syntax highlighted code -->
@@ -53,7 +53,7 @@
             width: 184px;" />
           <h3 style="position: relative; z-index: 1; text-align: left;">
             <span style="color:#FFD43B;">QtBridges</span> -
-            <span>QtQuick</span> for
+            <span>API Review</span> for
             <span style="color:#1E90FF;">Python</span>
           </h3>
           <hr class="qt-line" style="border: 2px solid #41CD52; width: 50%; margin: 10px 0; position: relative; z-index: 1;" />
@@ -64,462 +64,316 @@
       </section>
       <!--***************************************************************************-->
 
-        <section data-transition="slide-in fade-out" data-auto-animate>
-            <h2>Recap: <span style="color:#41CD52;">QtBridges</span> in May 2025</h2>
-          <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center;">
-          <!-- Left column -->
-          <div id="left" style="font-size: 60%;" class="fragment">
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2>⚙️ Internal Overview</h2>
+        <div style="font-size: 90%;">
+          <ul>
+            <li class="fragment">Python object wrapped as <span style="color:#1E90FF;">QAbstractItemModel (QAIM)</span></li>
+            <li class="fragment">Public methods &rarr; Slots (added dynamically)</li>
+            <li class="fragment">Python <code>@property</code> &rarr; Qt Properties
+              <ul>
+                <li class="fragment">Change signals <span style="color:#FFD43B;">auto-emit</span> when set from QML</li>
+              </ul>
+            </li>
+            <li class="fragment">QML calls via overridden <code>QAIM::qt_metacall()</code></li>
+          </ul>
+
+          <aside class="notes">
+          Technical Deep Dive:
+          - Uses QMetaObjectBuilder to construct dynamic meta-object
+          - Method signatures extracted from Python type hints (inspect module)
+          - All public methods registered as QMetaMethod::Slot
+          - qt_metacall() in AutoQmlBridgeModel handles interception
+          - Property notify signals only emit when set from QML, not Python
+          </aside>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <section data-transition="slide-in fade-out">
+          <h2><span style="color:#41CD52;">QtBridges</span> API Overview (1/2)</h2>
+          <div style="font-size: 85%;">
+            <h3 style="color:#1E90FF;">Core Functions</h3>
             <ul>
-          <li class="fragment">
-            <span style="color:#41CD52;">QtBridges API</span> – part of <span style="color:#1E90FF;">PySide6.QtQml</span>
-          </li>
-          <li class="fragment">
-            Exposing <span style="color:#FFD43B;">Python</span> data model to <span class="qt-green">QML</span>
-            <ul>
-          <li>Public Methods &rarr; <span class="qt-green">QML</span> Slots</li>
-          <li><span style="color:#FFD43B;">Python</span> Properties &rarr; <span class="qt-green">QML</span> Properties <span style="color:#888;">(+ <code>propertyNameChanged</code> signal)</span></li>
-          <li><code style="color:#41CD52;">data()</code> &rarr; Model data</li>
-          <li><code style="color:#FFD43B;">updateQML()</code> &rarr; Model updates via <code>beginResetModel()</code>/<code>endResetModel()</code></li>
-          <li><code style="color:#1E90FF;">AutoQmlBridge()</code> &rarr; Automatic <span class="qt-green">QML</span> exposure (creates singleton)</li>
-            </ul>
-          </li>
+              <li class="fragment"><code style="color:#41CD52;">bridge_instance()</code> – Expose Python object as QML singleton</li>
+              <li class="fragment"><code style="color:#41CD52;">bridge_type()</code> – Register Python class as QML type</li>
+              <li class="fragment"><code style="color:#41CD52;">@qtbridge</code> – Application setup decorator</li>
             </ul>
           </div>
-
-            <!-- Right column -->
-        <div id="right">
-        <pre style="font-size: 40%; width: 100%;" data-id="qtbridges_stringmodel"><code class="python" data-noescape data-line-numbers>
-from PySide.Qml import AutoQmlBridge, updateQML
-
-class StringModel:
-  def __init__(self):
-  self._items = ["Apple", "Banana"]
-
-  @property
-  def items(self) -> list[str]:
-  return self._items
-
-  @items.setter
-  def items(self, value: list[str]):
-  self._items = value
-
-  def add_string(self, new_str: str):
-  self._items.append(new_str)
-  updateQML(self)
-
-  def data(self) -> list[str]:
-  return self._items
-
-# Register with QML
-string_model = StringModel()
-AutoQmlBridge(string_model)
-        </code></pre>
-        </div>
         </section>
 
-      <section data-transition="slide-in fade-out" data-auto-animate>
-        <h2>Recap: <span style="color:#41CD52;">QtBridges</span> in May 2025</h2>
-        <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center;">
-          <!-- Left column -->
-          <div id="left" style="font-size: 60%;">
-        <ul>
-          <li>
-            <span style="color:#41CD52;">QtBridges API</span> – part of <span style="color:#1E90FF;">PySide6.QtQml</span> <span style="color:#e74c3c;">&#10060;</span>
-          </li>
-          <li>
-            <div class="less-prominent">
-              Exposing <span style="color:#FFD43B;">Python</span> data model to <span class="qt-green">QML</span>
-            </div>
+        <section data-transition="slide-in fade-out">
+          <h2><span style="color:#41CD52;">QtBridges</span> API Overview (2/2)</h2>
+          <div style="font-size: 85%;">
+            <h3 style="color:#1E90FF;">Model Change Decorators</h3>
             <ul>
-          <li class="less-prominent">Public Methods &rarr; <span class="qt-green">QML</span> Slots <span style="color:#41CD52;">&#10004;</span></li>
-          <li class="less-prominent"><span style="color:#FFD43B;">Python</span> Properties &rarr; <span class="qt-green">QML</span> Properties <span style="color:#888;">(+ <code>propertyNameChanged</code> signal)</span> <span style="color:#41CD52;">&#10004;</span></li>
-          <li class="less-prominent"><code style="color:#41CD52;">data()</code> &rarr; Model data <span style="color:#41CD52;">&#10004;</span></li>
-          <li><code style="color:#FFD43B;">updateQML()</code> &rarr; Model updates via <code>beginResetModel()</code>/<code>endResetModel()</code> <span style="color:#e74c3c;">&#10060;</span></li>
-          <li class="less-prominent"><code style="color:#1E90FF;">AutoQmlBridge()</code> &rarr; Automatic <span class="qt-green">QML</span> exposure (creates singleton) <span style="color:#41CD52;">&#10004;</span></li>
-            </ul>
-          </li>
-        </ul>
-          </div>
-
-          <!-- Right column -->
-          <div id="right"></div>
-          <pre style="font-size: 40%; width: 100%;" data-id="qtbridges_stringmodel"><code class="python" data-noescape data-line-numbers>
-from PySide.Qml import AutoQmlBridge, updateQML
-
-class StringModel:
-  def __init__(self):
-  self._items = ["Apple", "Banana"]
-
-  @property
-  def items(self) -> list[str]:
-  return self._items
-
-  @items.setter
-  def items(self, value: list[str]):
-  self._items = value
-
-  def add_string(self, new_str: str):
-  self._items.append(new_str)
-  updateQML(self)
-
-  def data(self) -> list[str]:
-  return self._items
-
-# Register with QML
-string_model = StringModel()
-AutoQmlBridge(string_model)
-          </code></pre>
-        </div>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2>What's New in <span style="color:#41CD52;">QtBridges</span> for Python (1/2)</h2>
-        <div style="display: grid; grid-template-columns: 1fr; gap: 20px;">
-          <div>
-        <h4 class="fragment" style="font-size: 80%;">Now a standalone project, independent of <span style="color:#1E90FF;">PySide6.QtQml</span></h4>
-        <ul style="font-size: 80%;">
-          <li class="fragment">Key challenges faced:</li>
-          <ul>
-        <li class="fragment">Find a suitable build backend that uses <span style="color:#41CD52;">CMake</span></li>
-        <li class="fragment">Reuse helper code from <span style="color:#FFD43B;">Shiboken</span>/<span style="color:#1E90FF;">PySide</span>
-          <ul>
-        <li><span style="color:#41CD52;">DynamicMetaObjectBuilder</span></li>
-        <li>PySide's <span style="color:#1E90FF;">Slot/Property</span> system</li>
-        <li><span style="color:#FFD43B;">Python/C++</span> conversion utilities</li>
-          </ul>
-        </li>
-        <li class="fragment"><span style="color:#1E90FF;">Cross-platform compatibility</span> (Windows, Linux, macOS)</li>
-        <li class="fragment">Build backend must support <b style="color:#41CD52;">Limited-API</b></li>
-          </ul>
-        </ul>
-          </div>
-        </div>
-        <aside class="notes">
-        1. Why do we write the core bridge code in C++ instead of Python?
-          - To directly access Qt's internal classes and meta-object system, which are only available in C++.
-          - To leverage Shiboken's advanced helper functions for Python/C++ type conversion and memory management.
-          - To use tools like DynamicMetaObjectBuilder for runtime registration of methods, properties, and signals.
-          - This enables seamless integration with QML and high performance, which would not be possible with a pure Python implementation.
-        </aside>
-      </section></aside>
-
-      <section data-transition="slide-in fade-out">
-        <h2>Limited API - What &amp; Why?</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-        <h3 style="color: #41CD52;">What is Limited API?</h3>
-        <ul style="font-size: 80%;">
-          <li class="fragment">Stable subset of <span style="color:#FFD43B;">Python</span> C API</li>
-          <li class="fragment">Guarantees <span style="color:#1E90FF;">ABI</span> compatibility across <span style="color:#FFD43B;">Python</span> versions</li>
-          <li class="fragment">Introduced in <span style="color:#FFD43B;">Python</span> 3.2, stabilized in 3.9+</li>
-        </ul>
-          </div>
-          <div>
-        <h3 style="color: #41CD52;">Benefits</h3>
-        <ul style="font-size: 80%;">
-          <li class="fragment">Single wheel for <span style="color:#FFD43B;">Python</span> 3.9-3.12</li>
-          <li class="fragment">Reduced maintenance burden
-            <ul>
-          <li>No need to rebuild for each <span style="color:#FFD43B;">Python</span> version</li>
-          <li>Fewer binary packages to maintain</li>
-            </ul>
-          </li>
-          <li class="fragment">Future-proof <span style="color:#1E90FF;">ABI</span> compatibility</li>
-          <li class="fragment">Smaller binary size</li>
-        </ul>
-          </div>
-        </div>
-        <aside class="notes">
-          Limited API ensures QtBridges works across Python versions without recompilation.
-          Critical for distribution and maintenance.
-        </aside>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2>Build backend: <span style="color:#1E90FF;">scikit-build-core</span></h2>
-        <ul style="font-size: 80%;">
-            <li>Modern <span style="color:#FFD43B;">Python</span> build backend for C++ extensions</li>
-            <li>Integrates <b><span style="color:#41CD52;">CMake</span></b> with <span style="color:#FFD43B;">Python</span> packaging</li>
-            <li>Cross-platform and supports <span style="color:#1E90FF;">Limited-API</span></li>
-            <li>Produces ready-to-install wheels for all platforms</li>
-        </ul>
-        <p style="font-size: 70%; margin-top: 10px;">
-          <a href="https://scikit-build-core.readthedocs.io/en/latest/" target="_blank">scikit-build-core docs</a>
-        </p>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 34vh;">
-          <h2 style="color:#41CD52; text-align: center;">How to build QtBridges?</h2>
-        </div>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2><span style="color:#41CD52;">Binary</span>/<span style="color:#1E90FF;">CMake</span> Dependencies</h2>
-        <!-- <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;"> -->
-            <div>
-            <ul style="font-size: 80%;">
-              <li>Shiboken6</li>
-              <li>PySide6</li>
-              <li>QtCore/QtQml</li>
-            </ul>
-            </div>
-        <!-- </div> -->
-      </section>
-
-            <!-- Python Wheels & Building -->
-      <!-- <section data-transition="slide-in fade-out">
-        <h2>Python Wheels: <span style="color:#41CD52;">How to Build & What You Get</span></h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-            <h3 style="color:#1E90FF;">Building the Project</h3>
-            <ul style="font-size: 80%;">
-              <li>Clone the repository</li>
-              <li>Install build dependencies: <code>pip install scikit-build-core</code></li>
-              <li>Build the wheel: <code>pip wheel .</code> or <code>python -m build</code></li>
-              <li>Install: <code>pip install dist/QtBridges-*.whl</code></li>
+              <li class="fragment"><code style="color:#FFD43B;">@insert</code> &rarr; <code>beginInsertRows()</code>/<code>endInsertRows()</code></li>
+              <li class="fragment"><code style="color:#FFD43B;">@remove</code> &rarr; <code>beginRemoveRows()</code>/<code>endRemoveRows()</code></li>
+              <li class="fragment"><code style="color:#FFD43B;">@edit</code> &rarr; <code>dataChanged()</code></li>
+              <li class="fragment"><code style="color:#FFD43B;">@move</code> &rarr; <code>beginMoveRows()</code>/<code>endMoveRows()</code></li>
+              <li class="fragment"><code style="color:#FFD43B;">@reset</code> &rarr; <code>beginResetModel()</code>/<code>endResetModel()</code></li>
             </ul>
           </div>
-          <div class="fragment">
-            <h3 style="color:#41CD52;">What's Inside the Wheel?</h3>
-            <ul style="font-size: 80%;">
-              <li>Compiled QtBridges Python C++ extension</li>
-              <li>All required Python modules and type hints (<code>py.typed</code>)</li>
-              <li>Compatible with Python 3.9–3.13 (single wheel via limited-API)</li>
-            </ul>
-          </div>
-        </div>
-        <aside class="notes">
-          - Emphasize ease of installation and deployment.
-          - Mention that wheels are platform-specific and contain all compiled code.
-        </aside>
-      </section> -->
-
-      <section data-transition="slide-in fade-out">
-        <h2>What's New in <span style="color:#41CD52;">QtBridges</span> for Python? (2/2)</h2>
-        <ul style="font-size: 80%;">
-          <li class="fragment">Replaces <code style="color:#FFD43B;">@updateQML</code> decorator</li>
-          <li class="fragment"><b>Granular model updates with new Python decorators:</b></li>
-          <ul>
-        <li class="fragment"><code style="color:#41CD52;">@insert</code> – <code>beginInsertRows()</code>, <code>endInsertRows()</code></li>
-        <li class="fragment"><code style="color:#e74c3c;">@remove</code> – <code>beginRemoveRows()</code>, <code>endRemoveRows()</code></li>
-        <li class="fragment"><code style="color:#FFD43B;">@move</code> – <code>beginMoveRows()</code>, <code>endMoveRows()</code></li>
-          </ul>
-        </ul>
-        <aside class="notes">
-          Having just updateQML() meant having parameters to specify in updateQML syntax whether
-          insert, remove or move
-        </aside>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2><code>@insert</code> Decorator</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-            <ul style="font-size: 70%;">
-              <li>Use <code>@insert</code> to mark methods that insert new items into your model.</li>
-              <li>Automatically triggers granular model updates in QML views.</li>
-            </ul>
-          </div>
-          <div>
-            <pre style="font-size: 40%; width: 100%;"><code class="python" data-noescape>
-class StringModel:
-  ...
-
-  @insert
-  def add_string(self, value: str):
-      if value in self._items:
-          return False
-      self._items.append(value)
-      return True
-
-  @insert
-  def insert_at(self, index: int, value: str):
-      if value in self._items:
-          return False
-      self._items.insert(index, value)
-      return True
-            </code></pre>
-          </div>
-        </div>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2><code>@remove</code> Decorator</span></h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-            <ul style="font-size: 70%;">
-              <li>Use <code>@remove</code> to mark methods that remove items from your model.</li>
-              <li>Will enable granular removal updates in QML views.</li>
-            </ul>
-          </div>
-          <div>
-            <pre style="font-size: 40%; width: 100%;"><code class="python" data-noescape>
-class StringModel:
-    ...
-
-    @remove
-    def remove_at(self, index: int) -> bool:
-        """Remove item at specific index"""
-        if 0 <= index < len(self._items):
-            self._items.pop(index)
-            return True
-        return False
-            </code></pre>
-          </div>
-        </div>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2><code>@move</code> Decorator</span></h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-            <ul style="font-size: 60%;">
-              <li>Use <code>@move</code> to mark methods that move items within your model.</li>
-              <li>Will enable granular move updates in QML views.</li>
-            </ul>
-          </div>
-          <div>
-            <pre style="font-size: 40%; width: 100%;"><code class="python" data-noescape>
-class StringModel:
-  ...
-
-  @move
-  def move_item(self, from_index: int, to_index: int):
-      if 0 <= from_index < len(self._items)
-         and 0 <= to_index < len(self._items):
-          item = self._items.pop(from_index)
-          self._items.insert(to_index, item)
-          return True
-      return False
-            </code></pre>
-          </div>
-        </div>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-        <h2>Data Mapping in <span style="color:#41CD52;">QtBridges</span></h2>
-        <ul style="font-size: 80%;">
-          <li>Type mapping: <b>same as <span style="color:#1E90FF;">PySide6</span></b></li>
-          <li>Conversion handled by <b><span style="color:#FFD43B;">Shiboken</span></b></li>
-          <li><span style="color:#FFD43B;">Python</span> containers (list, dict) &rarr; <span style="color:#41CD52;">Qt</span> types (QVariantList, QVariantMap)</li>
-          <li>Built-in types (<code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, <code>None</code>) handled directly</li>
-          <li>Custom/complex types: <span style="color:#FFD43B;">Shiboken</span> converters</li>
-        </ul>
-      </section>
-
-      <!-- Typing & .pyi Files -->
-      <section data-transition="slide-in fade-out">
-        <h2>Typing & <span style="color:#FFD43B;">.pyi Files</span> in Python</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
-          <div>
-            <h3 style="color:#41CD52;">Why Typing?</h3>
-            <ul style="font-size: 80%;">
-                <li><span style="color:#FFD43B;">Python</span> is dynamically typed—no compile-time type checks</li>
-                <li>Type hints improve code completion, static analysis, and error detection</li>
-                <li>Helps IDEs (<span style="color:#1E90FF;">PyCharm</span>, <span style="color:#1E90FF;">VSCode</span>) provide better developer experience</li>
-            </ul>
-          </div>
-          <div class="fragment">
-            <h3 style="color:#41CD52;">What are <code>.pyi</code> Files?</h3>
-            <ul style="font-size: 80%;">
-                <li>Stub files containing type information for compiled modules</li>
-                <li>Required for tools like <code>mypy</code> and IDEs to understand <span style="color:#FFD43B;">Python</span>/<span style="color:#1E90FF;">C/C++</span> extensions</li>
-                <li>Included in the wheel (see <code>py.typed</code> marker)</li>
-                <li>Enables static type checking for your <span style="color:#FFD43B;">Python</span> API</li>
-            </ul>
-          </div>
-        </div>
-        <aside class="notes">
-          - Explain that compiled languages (C++, Rust) have type info at compile time.
-          - Python needs .pyi files for static analysis and IDE support.
-        </aside>
-      </section>
-
-      <section data-transition="slide-in fade-out">
-      <h2>Debugging</h2>
-      <ul style="font-size: 80%;">
-        <li>
-          <span style="color:#41CD52;">QML</span> &rarr; <span style="color:#FFD43B;">Python</span> debugging already works (at least in <b>QtCreator</b>)
-        </li>
-        <li>
-          Need to check with <b>VSCode</b> extension
-        </li>
-      </ul>
-      <aside class="notes">
-        - Emphasize that QML-to-Python debugging is already possible in QtCreator.
-        - Mention that Python-side debugging is straightforward.
-        - Future work: make this seamless in VSCode and other editors.
-      </aside>
         </section>
+      <!--***************************************************************************-->
 
+      <!--***************************************************************************-->
       <section data-transition="slide-in fade-out">
-      <h2>Documentation</h2>
-      <ul style="font-size: 80%;">
-        <li>Current docs include:</li>
-        <ul>
-          <li>Simple comparison between <b style="color:#1E90FF;">PySide6</b> and <b style="color:#41CD52;">QtBridges</b></li>
-          <li>How to build the project</li>
-          <li>How to build the documentation</li>
-          <li>How to run the existing tests</li>
-        </ul>
-        <li class="fragment">Planned improvements:
-        <ul>
-          <li>Porting documentation (<span style="color:#1E90FF;">PySide6</span> &rarr; <span style="color:#41CD52;">QtBridges</span>)</li>
-          <li>Comprehensive <span style="color:#FFD43B;">API</span> documentation</li>
-          <li>More usage examples and tutorials</li>
-        </ul>
-        </li>
-      </ul>
-      <aside class="notes">
-        - Mention that current docs are minimal but practical.
-        - Future docs will help users migrate, understand the API, and get started quickly.
-      </aside>
-        </section>
+        <h2><code style="color:#41CD52;">@qtbridge</code> Decorator</h2>
+        <div style="font-size: 75%;">
+          <pre><code class="python" data-noescape>def qtbridge(
+    module: str | None = None,
+    type_name: str | None = None,
+    qml_file: str | None = None,
+    import_paths: List[str] | None = None
+) -> Callable</code></pre>
 
-      <section data-transition="slide-in fade-out">
-        <h2>CI / <span style="color:#FFD43B;">Coin</span></h2>
-        <ul style="font-size: 80%;">
-          <li>Should work easily on <span style="color:#FFD43B;">CI</span></li>
-          <li>Requires <b><span style="color:#1E90FF;">PySide6-Essentials</span></b> and <b><span style="color:#41CD52;">Shiboken</span></b> to be picked from <span style="color:#FFD43B;">PyPI</span></li>
-          <li>Minimal extra configuration needed for standard <span style="color:#FFD43B;">Python</span> CI pipelines</li>
-        </ul>
-        <aside class="notes">
-          - Emphasize that CI integration is straightforward.
-          - PySide6-Essentials and Shiboken are available on PyPI for easy install.
-          - Coin (Qt's CI) can use these wheels directly.
-        </aside>
-      </section>
-
-      <!-- Requirements for TP -->
-      <section data-transition="slide-in fade-out">
-        <h2>Requirements for <span style="color:#41CD52;">TP</span></h2>
+        <div class="fragment" style="margin-top: 8px; font-size: 90%; margin-left: -18px;"><b>Abstracts the creation of Qt event loop and QML engine</b></div>
         <ul style="font-size: 90%;">
-          <li class="fragment">Support for <span style="color:#FFD43B;">instantiable</span> types</li>
-          <li class="fragment"><span style="color:#1E90FF;">QRangeModel/QRangeModelAdapter</span> support to directly expose data</li>
-          <li class="fragment"><span style="color:#41CD52;">qmltypes</span> file generation through a <span style="color:#41CD52;">create-qmltypes</span> tool</li>
-          <li class="fragment">Support for <span style="color:#e74c3c;">table</span> data:
-        <ul>
-          <li>list, tuple &rarr; <b>List</b> (QML: ListView)</li>
-          <li>dict, list of dict/objects, pandas.DataFrame, SQL &rarr; <b>Table</b> (QML: TableView)</li>
-          <li>custom dataclass &rarr; <b>List</b> or <b>Table</b> (QML: ListView/TableView)</li>
+          <li class="fragment"><code>module</code>: QML module name (looks for <code>&lt;module&gt;.qml</code>)</li>
+          <li class="fragment"><code>type_name</code>: Specific QML component to instantiate</li>
+          <li class="fragment"><code>qml_file</code>: Direct path to QML file</li>
+          <li class="fragment"><code>import_paths</code>: Additional directories for QML imports</li>
         </ul>
-          </li>
-        </ul>
+
         <aside class="notes">
-          - TP = Technical Preview
-          - Data type mapping: list/tuple → ListView, dict/list-of-dict/DataFrame → TableView, nested dict/tree → TreeView.
-          - Custom dataclasses can be mapped as List or Table.
-          - For TP, main focus is on List and Table support.
+          <ul>
+            <li>Simplifies QML application setup</li>
+            <li>Automatically initializes <code>QGuiApplication</code> and <code>QQmlApplicationEngine</code></li>
+            <li>Handles QML file loading and engine lifecycle</li>
+            <li>Manages application event loop</li>
+          </ul>
         </aside>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2><code style="color:#41CD52;">bridge_instance()</code> - Python object</h2>
+        <div style="font-size: 75%;">
+          <pre><code class="python" data-noescape>def bridge_instance(
+    instance: DataProvider,
+    name: str,
+    uri: str = "backend"
+) -> None</code></pre>
+
+        <div class="fragment" style="margin-top: 8px; font-size: 90%; margin-left: -18px;"><b>Creates a QML singleton</b> accessible by <code>name</code> in QML</div>
+
+        <ul style="font-size: 90%;">
+          <li class="fragment"><code>instance</code>: Python object with <code>data()</code> method</li>
+          <li class="fragment"><code>name</code>: QML singleton name (must start with uppercase)</li>
+          <li class="fragment"><code>uri</code>: QML module namespace (default: "backend")</li>
+        </ul>
+
+        <aside class="notes">
+        Implementation Details:
+        - Creates a QAbstractItemModel wrapper internally
+        - Dynamically modifies meta-object to add slots for each public Python method
+        - Uses QMetaObject::qt_metacall() to forward calls to Python methods
+        - Requires data() method with type hint to expose data through QAIM's data()
+        - Property setters called from QML emit propertyNameChanged signals automatically
+        </aside>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2><code style="color:#41CD52;">bridge_instance()</code> - Sequence Containers</h2>
+        <div style="font-size: 75%;">
+          <pre><code class="python" data-noescape>def bridge_instance(
+    obj: list | tuple | numpy.ndarray,
+    name: str,
+    uri: str = "backend"
+) -> None</code></pre>
+
+          <div class="fragment" style="margin-top: 8px; font-size: 90%; margin-left: -18px;"><b>Internally a QRangeModel</b> (not a QAIM)</div>
+
+          <ul style="font-size: 90%;">
+            <li class="fragment"><code>obj</code>: The Python container to expose (can be a <code>list</code>, <code>tuple</code>, or <code>numpy.ndarray</code>).</li>
+            <li class="fragment"><code>name</code>: The name used to access the model in QML.</li>
+            <li class="fragment"><code>uri</code>: The QML module namespace (default: <code>"backend"</code>;).</li>
+          </ul>
+
+            <aside class="notes">
+            Implementation Details:
+            - Wraps container in QRangeModel (custom QAIM subclass)
+            - Creates a snapshot at registration time
+            - Limitation: Post-registration modifications to original Python container are not reflected in QML
+            - QML modifications via QRangeModel do not update the original Python container
+            - For dynamic models, use the class variant with @insert/@remove decorators
+            </aside>
+          </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2><code style="color:#41CD52;">bridge_type()</code></h2>
+        <div style="font-size: 68%;">
+          <pre><code class="python" data-noescape>def bridge_type(
+    type: type,
+    uri: str,
+    version: str,
+    name: str | None = None,
+    default_property: str | None = None
+) -> None</code></pre>
+
+        <div class="fragment" style="margin-top: 8px; font-size: 90%; margin-left: -18px;"><b>Used to create a Python object from QML</b></div>
+
+        <ul style="font-size: 85%;">
+          <li class="fragment"><code>type</code>: Python class to register</li>
+          <li class="fragment"><code>uri</code>: QML module namespace</li>
+          <li class="fragment"><code>version</code>: Version string (e.g., "1.0")</li>
+          <li class="fragment"><code>name</code>: Custom QML type name (defaults to class name)</li>
+          <li class="fragment"><code>default_property</code>: Property for default child assignment in QML</li>
+        </ul>
+
+        <aside class="notes">
+        Implementation Details:
+        - Registers Python class as instantiable QML type
+        - Internally creates QAIM wrapper with dynamic meta-object
+        - Public methods become slots via qt_metacall() forwarding
+        - Property setters emit propertyNameChanged when called from QML
+        - QML can create multiple instances of the registered type
+        </aside>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2 style="text-align: center;">Model Decorators in Action</h2>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2>🔄 Type Conversion</h2>
+        <div style="font-size: 80%;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 85%;">
+        <thead>
+          <tr style="background-color: #41CD52;">
+            <th style="border: 1px solid #ddd; padding: 8px;">Python Type</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Qt/C++ Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>int</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>int / long long</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>float</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>double</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>str</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QString</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>bool</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>bool</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>list</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QVariantList</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>dict</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QVariantMap</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>None</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QVariant()</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>dataclass</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QVariantMap (fields as keys/values)</code></td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>custom Python object</code></td>
+            <td style="border: 1px solid #ddd; padding: 8px;"><code>QVariant(PySide::PyObjectWrapper)</code></td>
+          </tr>
+        </tbody>
+          </table>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+      <!--***************************************************************************-->
+      <section data-transition="slide-in fade-out">
+        <h2>⚠️ Limitations</h2>
+        <div style="font-size: 80%;">
+          <ul>
+            <li class="fragment"><b>Type hints required</b> for all properties and methods.</li>
+            <li class="fragment"><b>No custom signals</b>—auto-generated only, and only emit when set from QML.</li>
+            <li class="fragment"><b>Container updates not tracked</b> after registration with <code>bridge_instance()</code>.</li>
+            <li class="fragment"><b>Model decorators</b> (<code>@insert</code>, <code>@remove</code>, etc.) <b>only work with</b> <code>bridge_instance()</code>.</li>
+            <li class="fragment"><b>Current types support</b>—use basic types, lists, dicts, or dataclasses.</li>
+          </ul>
+        </div>
+      </section>
+      <!--***************************************************************************-->
+
+        <section data-transition="slide-in fade-out">
+        <h2>🚧 Work In Progress</h2>
+        <div style="font-size: 85%;">
+          <ul>
+            <li class="fragment">
+              <b>@complete Decorator</b>
+              <ul>
+                <li class="fragment">Maps to QML's <code>Component.onCompleted</code> via <code>QQmlParserStatus::componentComplete()</code></li>
+                <li class="fragment">Allows Python initialization logic after QML component is fully loaded</li>
+                  <pre class="fragment" style="font-size: 60%; margin-top: 10px;"><code class="python" data-noescape>class MyModel:
+          @complete
+          def on_component_complete(self):
+              self.load_initial_data()
+              print("Component is ready!")</code></pre>
+              </ul>
+            </li>
+            <li class="fragment">
+              <b>Model Decorators for <code>bridge_type()</code></b>
+              <ul>
+                <li class="fragment">Enable <code>@insert</code>, <code>@remove</code>, <code>@edit</code>, <code>@move</code>, <code>@reset</code> for types registered with <code>bridge_type()</code></li>
+                <li class="fragment">Provides consistent API for both instance and type registration</li>
+                <li class="fragment">Makes QML-instantiated objects fully feature-complete with QAIM change notifications</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section data-transition="slide-in fade-out">
-        <h2 style="color:#41CD52;">Thank You!</h2>
-        <div style="margin-top: 30px;">
-          <img src="img/python.svg" style="width: 80px; margin-right: 20px;" />
+        <h2>🔭 In Planning</h2>
+        <div style="font-size: 90%;">
+          <ul>
+            <li class="fragment"><b>Table Data Support</b> – Pandas DataFrames & SQLite integration</li>
+            <li class="fragment"><b>QRangeModel Improvements</b> – Bidirectional sync between Python and QML</li>
+            <li class="fragment"><b>Python→QML Signals</b> – Emit property changes from Python code</li>
+          </ul>
         </div>
+        <aside class="notes">
+          Table Data Support:
+          - Native integration with Pandas DataFrames and SQLite databases
+          - Automatic column detection and role mapping
+          - Built-in sorting, filtering, and pagination
+          - Efficient incremental updates without full model resets
+
+          QRangeModel Improvements:
+          - Make QRangeModel behave like original Python container
+          - Bidirectional synchronization between Python and QML
+          - Full attribute and method access passthrough
+
+          Signal Emission from Python:
+          - Allow property change signals to emit when properties are modified from Python code
+          - Enable Python→QML function calls and signal emission
+          - Full bidirectional communication without manual QMetaObject.invokeMethod()
+        </aside>
       </section>
+
     </div>
   </div>
 
@@ -621,7 +475,7 @@ class StringModel:
       <div id="footer-left">
         <img src="img/qt_logo.webp" style="width: 32px" />
         <p style="font-size: 14pt; padding-left: 5px;">
-          <i class="white">QtBridges | May 23, 2025</i>
+          <i class="white">QtBridges | 28th November, 2025</i>
       </div>
   </div>
 
