@@ -15,6 +15,23 @@
   <!-- Theme used for syntax highlighted code -->
   <link rel="stylesheet" href="reveal.js/plugin/highlight/monokai.css">
 
+  <!-- Mermaid.js for diagrams -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        primaryColor: '#41CD52',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#41CD52',
+        lineColor: '#1E90FF',
+        secondaryColor: '#1E90FF',
+        tertiaryColor: '#FFD43B'
+      }
+    });
+  </script>
+
   <!-- Printing and PDF exports -->
   <script>
     if( window.location.search.match( /print-pdf/gi ) ) {
@@ -67,27 +84,52 @@
       <!--***************************************************************************-->
       <section data-transition="slide-in fade-out">
         <h2>⚙️ Internal Overview</h2>
-        <div style="font-size: 90%;">
-          <ul>
-            <li class="fragment">Python object wrapped as <span style="color:#1E90FF;">QAbstractItemModel (QAIM)</span></li>
-            <li class="fragment">Public methods &rarr; Slots (added dynamically)</li>
-            <li class="fragment">Python <code>@property</code> &rarr; Qt Properties
-              <ul>
-                <li class="fragment">Change signals <span style="color:#FFD43B;">auto-emit</span> when set from QML</li>
-              </ul>
-            </li>
-            <li class="fragment">QML calls via overridden <code>QAIM::qt_metacall()</code></li>
-          </ul>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; font-size: 80%;">
+          <!-- Left column: Key points -->
+          <div>
+            <ul>
+              <li class="fragment">Python object wrapped as <span style="color:#1E90FF;">QAbstractItemModel (QAIM)</span></li>
+              <li class="fragment">Public methods &rarr; Slots (added dynamically)</li>
+              <li class="fragment">Python <code>@property</code> &rarr; Qt Properties
+                <ul>
+                  <li class="fragment">Change signals <span style="color:#FFD43B;">auto-emit</span> when set from QML</li>
+                </ul>
+              </li>
+              <li class="fragment">QML calls via overridden <code>QAIM::qt_metacall()</code></li>
+            </ul>
+          </div>
 
-          <aside class="notes">
-          Technical Deep Dive:
-          - Uses QMetaObjectBuilder to construct dynamic meta-object
-          - Method signatures extracted from Python type hints (inspect module)
-          - All public methods registered as QMetaMethod::Slot
-          - qt_metacall() in AutoQmlBridgeModel handles interception
-          - Property notify signals only emit when set from QML, not Python
-          </aside>
+          <!-- Right column: Mermaid diagram -->
+          <div>
+            <pre class="mermaid" style="font-size: 2.2em; min-width: 600px; min-height: 500px; line-height: 1.2;">graph TB
+A[Python Object] -->|Wrapped as| B[QAIM Wrapper]
+B -->|Creates| C[Dynamic Meta-Object]
+C -->|Registers| D[Methods as Slots]
+C -->|Registers| E[Properties]
+F[QML Call] -->|Invokes| G[qt_metacall]
+G -->|Forwards to| H[Python Method]
+E -.->|Auto-emit on set from QML| I[propertyChanged Signal]
+
+style A fill:#1E90FF,stroke:#fff,color:#fff
+style B fill:#41CD52,stroke:#fff,color:#fff
+style C fill:#FFD43B,stroke:#333,color:#333
+style D fill:#41CD52,stroke:#fff,color:#fff
+style E fill:#41CD52,stroke:#fff,color:#fff
+style G fill:#41CD52,stroke:#fff,color:#fff
+style H fill:#1E90FF,stroke:#fff,color:#fff
+style I fill:#FFD43B,stroke:#333,color:#333
+</pre>
+          </div>
         </div>
+
+        <aside class="notes">
+        Technical Deep Dive:
+        - Uses QMetaObjectBuilder to construct dynamic meta-object
+        - Method signatures extracted from Python type hints (inspect module)
+        - All public methods registered as QMetaMethod::Slot
+        - qt_metacall() in AutoQmlBridgeModel handles interception
+        - Property notify signals only emit when set from QML, not Python
+        </aside>
       </section>
       <!--***************************************************************************-->
 
