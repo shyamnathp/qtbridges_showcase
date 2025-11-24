@@ -310,9 +310,9 @@
           <ul>
             <li class="fragment"><b>Type hints required</b> for all properties and methods.</li>
             <li class="fragment"><b>No custom signals</b>—auto-generated only, and only emit when set from QML.</li>
-            <li class="fragment"><b>Container updates not tracked</b> after registration with <code>bridge_instance()</code>.</li>
+            <li class="fragment"><b>Container (QRangeModel case) updates not tracked</b> after registration with <code>bridge_instance()</code>.</li>
             <li class="fragment"><b>Model decorators</b> (<code>@insert</code>, <code>@remove</code>, etc.) <b>only work with</b> <code>bridge_instance()</code>.</li>
-            <li class="fragment"><b>Current types support</b>—use basic types, lists, dicts, or dataclasses.</li>
+            <li class="fragment"><b>Current types support</b>—use <span style="color:#FFD43B;">primitive types</span>, <span style="color:#41CD52;">lists</span>, <span style="color:#1E90FF;">Python dataclasses</span>.</li>
           </ul>
         </div>
       </section>
