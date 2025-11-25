@@ -12,6 +12,11 @@
   <link rel="stylesheet" href="css/qt-night.css">
   <link rel="stylesheet" href="css/extras.css">
 
+  <!-- Google Fonts: Titillium Web -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <!-- Theme used for syntax highlighted code -->
   <link rel="stylesheet" href="reveal.js/plugin/highlight/monokai.css">
 
@@ -84,24 +89,8 @@
       <!--***************************************************************************-->
       <section data-transition="slide-in fade-out">
         <h2>⚙️ Internal Overview</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; font-size: 80%;">
-          <!-- Left column: Key points -->
-            <div>
-            <ul>
-              <li>Python object wrapped as <span style="color:#1E90FF;">QAbstractItemModel (QAIM)</span></li>
-              <li>Public methods &rarr; Slots (added dynamically)</li>
-              <li>Python <code>@property</code> &rarr; Qt Properties
-              <ul>
-                <li>Change signals <span style="color:#FFD43B;">auto-emit</span> when set from QML</li>
-              </ul>
-              </li>
-              <li>QML calls via overridden <code>QAIM::qt_metacall()</code></li>
-            </ul>
-            </div>
-
-          <!-- Right column: Mermaid diagram -->
-          <div>
-            <pre class="mermaid" style="font-size: 2.2em; min-width: 600px; min-height: 500px; line-height: 1.2;">graph TB
+        <div style="display: flex; justify-content: center; align-items: center;">
+          <pre class="mermaid" style="font-size: 2.2em; min-width: 600px; min-height: 500px; line-height: 1.2; border-left: none; font-family: 'Titillium Web', sans-serif;">graph TB
 A[Python Object] -->|Wrapped as| B[QAIM Wrapper]
 B -->|Creates| C[Dynamic Meta-Object]
 C -->|Registers| D[Methods as Slots]
@@ -119,7 +108,6 @@ style G fill:#41CD52,stroke:#fff,color:#fff
 style H fill:#1E90FF,stroke:#fff,color:#fff
 style I fill:#FFD43B,stroke:#333,color:#333
 </pre>
-          </div>
         </div>
 
         <aside class="notes">
@@ -351,8 +339,8 @@ style I fill:#FFD43B,stroke:#333,color:#333
         <div style="font-size: 80%;">
           <ul>
             <li class="fragment"><b>Type hints required</b> for all properties and methods.</li>
-            <li class="fragment"><b>No custom signals</b>—auto-generated only, and only emit when set from QML.</li>
-            <li class="fragment"><b>Container (QRangeModel case) updates not tracked</b> after registration with <code>bridge_instance()</code>.</li>
+            <li class="fragment"><b>No custom signals</b>—auto-generated only, and only emit when set from QML. <span style="color:#FFD43B; font-size:90%;">(Planned)</span></li>
+            <li class="fragment"><b>Container (QRangeModel case) updates not tracked</b> after registration with <code>bridge_instance()</code>. <span style="color:#FFD43B; font-size:90%;">(Planned)</span></li>
             <li class="fragment"><b>Model decorators</b> (<code>@insert</code>, <code>@remove</code>, etc.) <b>only work with</b> <code>bridge_instance()</code>.</li>
             <li class="fragment"><b>Current types support</b>—use <span style="color:#FFD43B;">primitive types</span>, <span style="color:#41CD52;">lists</span>, <span style="color:#1E90FF;">Python dataclasses</span>.</li>
           </ul>
@@ -416,6 +404,10 @@ style I fill:#FFD43B,stroke:#333,color:#333
         </aside>
       </section>
 
+      <section data-transition="slide-in fade-out">
+        <h1 style="font-size: 3em; text-align: center; margin-top: 40%;">Questions?</h1>
+      </section>
+
     </div>
   </div>
 
@@ -437,6 +429,7 @@ style I fill:#FFD43B,stroke:#333,color:#333
       margin: 0.1, // Margin around the content
       minScale: 0.5, // Minimum scaling factor
       maxScale: 2.0, // Maximum scaling factor
+      slideNumber: 'c/t', // Display current slide number / total slides
       // Learn about plugins: https://revealjs.com/plugins/
       plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
       });

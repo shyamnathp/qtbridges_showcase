@@ -28,6 +28,9 @@
   --r-heading3-size: 1.3em;
   --r-heading4-size: 1.1em;
   --r-main-font-size: 32px;
+  --r-main-font: 'Titillium Web', sans-serif;
+  --r-heading-font: 'Titillium Web', sans-serif;
+  font-family: 'Titillium Web', sans-serif;
 }
 
 /* Links with Qt green */
@@ -183,9 +186,12 @@
 
 /* Slide numbers with Qt branding */
 .reveal .slide-number {
-  background-color: rgba(65, 205, 82, 0.8);
-  color: #000;
+  background-color: transparent;
+  color: var(--qt-green);
   font-weight: 600;
+  font-size: 0.9em;
+  bottom: 12px;
+  right: 12px;
 }
 
 /* Progress bar */
